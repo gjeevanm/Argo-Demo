@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: spark-argo-workflow-
+  namespace: argo
+spec:
+  entrypoint: dag-sequence
+  templates:
+  - name: step1
+    resource:
+      action: create
+      manifest: |
+        apiVersion: "sparkoperator.k8s.io/v1beta2"
+        kind: SparkApplication
+        metadata:
+          generateName: spark-argo-workflow-
+          namespace: argo
+        spec:
+          concurrencyPolicy: Allow
+          dynamicAllocation:
+            enabled: false
+            initialExecutors: 2
+          type: Scala
+          mode: cluster
+          image: gjeevanm/spark:v3.1.1
+          imagePullPolicy: Always
+          mainClass: org.apache.spark.examples.SparkPi
+          mainApplicationFile: local:///opt/spark/examples/jars/spark-examples_2.12-3.1.1.jar
+          restartPolicy:
+            type: Never
+          sparkVersion: 3.1.1
+          driver:
+            memory: 1G
+          executor:
+            cores: 2
+            memory: 1G
+  - name: dag-sequence
+    dag:
+      tasks:
+      - name: dag1
+        template: step1
