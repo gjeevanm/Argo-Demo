@@ -1,0 +1,5 @@
+# Create a namespace for argo
+kubectl create namespace argo
+
+# Install Argo Workflow
+kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/install.yaml
